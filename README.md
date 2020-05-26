@@ -1,1 +1,1 @@
-# Learn concurent mode (experimental)
+Learn concurent mode (experimental)
