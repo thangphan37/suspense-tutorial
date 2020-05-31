@@ -1,6 +1,7 @@
 import React, { Suspense, useState } from "react";
 import "./App.css";
 import { fetchProfileData } from "./fakeApi.js";
+import { RefreshPage } from "./refresh";
 
 const initialResource = fetchProfileData(0);
 
@@ -77,6 +78,7 @@ function App() {
       </button>
       {isPending ? "Loading..." : null}
       <ProfilePage resource={resource} />
+      <RefreshPage />
     </>
   );
 }
