@@ -1,6 +1,7 @@
 export function fetchProfileData(userId) {
   let userPromise = fetchUser(userId);
   let postsPromise = fetchPosts(userId);
+  //let postsPromise = Promise.reject("Cannot fetch posts");
 
   return {
     userId,

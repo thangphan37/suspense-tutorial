@@ -4,6 +4,24 @@ import { fetchProfileData } from "./fakeApi.js";
 
 const initialResource = fetchProfileData(0);
 
+class ErrorBoundary extends React.Component {
+  state = { hasError: false, error: null };
+  static getDerivedStateFromError(error) {
+    return {
+      hasError: true,
+      error
+    };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+
+    return this.props.children;
+  }
+}
+
 function getNextId(id) {
   return id === 3 ? 0 : id + 1;
 }
@@ -12,9 +30,11 @@ function ProfilePage({ resource }) {
   return (
     <Suspense fallback={<h1>Loading profile...</h1>}>
       <ProfileDetails resource={resource} />
-      <Suspense fallback={<h1>Loading posts...</h1>}>
-        <ProfileTimeline resource={resource} />
-      </Suspense>
+      <ErrorBoundary fallback={<h2>Could not fetch posts.</h2>}>
+        <Suspense fallback={<h1>Loading posts...</h1>}>
+          <ProfileTimeline resource={resource} />
+        </Suspense>
+      </ErrorBoundary>
     </Suspense>
   );
 }
@@ -38,17 +58,24 @@ function ProfileTimeline({ resource }) {
 
 function App() {
   const [resource, setResource] = useState(initialResource);
+  const [startTransition, isPending] = React.unstable_useTransition({
+    timeoutMs: 3000
+  });
 
   return (
     <>
       <button
+        disabled={isPending}
         onClick={() => {
-          const nextUserId = getNextId(resource.userId);
-          setResource(fetchProfileData(nextUserId));
+          startTransition(() => {
+            const nextUserId = getNextId(resource.userId);
+            setResource(fetchProfileData(nextUserId));
+          });
         }}
       >
         Next
       </button>
+      {isPending ? "Loading..." : null}
       <ProfilePage resource={resource} />
     </>
   );
