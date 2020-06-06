@@ -2,6 +2,7 @@ import React, { Suspense, useState } from "react";
 import "./App.css";
 import { fetchProfileData } from "./fakeApi.js";
 import { RefreshPage } from "./refresh";
+import { TranslationPage } from "./input";
 
 const initialResource = fetchProfileData(0);
 
@@ -79,6 +80,7 @@ function App() {
       {isPending ? "Loading..." : null}
       <ProfilePage resource={resource} />
       <RefreshPage />
+      <TranslationPage />
     </>
   );
 }

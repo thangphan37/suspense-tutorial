@@ -8,6 +8,7 @@ package-lock.json
 *.swp
 # testing
 /coverage
+yarn.lock
 
 # production
 /build
