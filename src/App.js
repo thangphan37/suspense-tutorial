@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useState, useDeferredValue } from "react";
 import "./App.css";
 import { fetchProfileData } from "./fakeApi.js";
 import { RefreshPage } from "./refresh";
@@ -29,12 +29,19 @@ function getNextId(id) {
 }
 
 function ProfilePage({ resource }) {
+  const deferredResource = React.unstable_useDeferredValue(resource, {
+    timeoutMs: 1000
+  });
+
   return (
     <Suspense fallback={<h1>Loading profile...</h1>}>
       <ProfileDetails resource={resource} />
       <ErrorBoundary fallback={<h2>Could not fetch posts.</h2>}>
         <Suspense fallback={<h1>Loading posts...</h1>}>
-          <ProfileTimeline resource={resource} />
+          <ProfileTimeline
+            resource={deferredResource}
+            isStale={deferredResource !== resource}
+          />
         </Suspense>
       </ErrorBoundary>
     </Suspense>
@@ -47,10 +54,10 @@ function ProfileDetails({ resource }) {
   return <h1>{user.name}</h1>;
 }
 
-function ProfileTimeline({ resource }) {
+function ProfileTimeline({ isStale, resource }) {
   const posts = resource.posts.read();
   return (
-    <ul>
+    <ul style={{ opacity: isStale ? 0.7 : 1 }}>
       {posts.map(post => (
         <li key={post.id}> {post.text}</li>
       ))}
